@@ -129,7 +129,7 @@ The PInvoking of my C Wrapped methods
         [return: MarshalAs(UnmanagedType.BStr)]
         public static extern string GetPlayerNameCpp(IntPtr gameManager);
 ```
-The GetGameObjectContainer() method in C#, marshalling the Gameobject data
+The GetGameObjectContainer() method in C#, marshalling the Gameobject data by using specific Marshal attributes and some pointer arithmetics.
 ```c#
 public List<GameObject> GetGameObjectContainer(ObjectContainerType type)
         {
