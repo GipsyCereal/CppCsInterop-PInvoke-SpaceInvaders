@@ -52,7 +52,7 @@ extern "C" _declspec(dllexport) void __stdcall UpdateGameManager(CppLibrary::Gam
 }
 ```
 Remember the mentioned issue around classes? The GameObject class cannot be easily PInvoked through a C function, solution == pointers!
-passing a pointer to const pointer reference parameter into our method, we can safely create an std::vector<Gameobject*> and pass a pointer, to the 1st pointer in this vector, to our parameter.
+Passing a pointer to const pointer reference parameter into our method, we can safely create an std::vector<Gameobject*> and pass a pointer, to the 1st pointer in this vector, to our parameter.
 
 Later, in C# we can ask what is on the pointer's memory address, giving us the pointer to our Gameobject data, then marshalling said unmanaged data into a formatted class in C#.
 ```cpp
