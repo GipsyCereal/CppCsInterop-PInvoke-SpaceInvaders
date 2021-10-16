@@ -26,7 +26,7 @@ Having the space invaders logic in C++, how do we make it work in C# Unity? By u
 C++ is a direct descendant of C that retains almost all of C as a subset, hence we can use a C wrapper as "bridge" to PInvoke our code into C#!
 This prevents the need for name mangling by simply declaring we want to export our methods as C methods.
 
-The drawback? C does not support classes, thus classes object aren't so simple to marshal to managed code.
+The drawback? C does not support classes, thus classes object aren't so simple to PInvoke into managed code.
 
 To declare a C method export:
 ```cpp
