@@ -9,6 +9,7 @@ Pros for using explicit PInvoke:
  * Not platform specific.
  * No real need for an intermediate library (you can directly call the managed 
 functions)  
+
 Cons for using explicit PInvoke:
  * Has a more marshalling overhead causing lesser performance than implicit invoking, this does not matter in many cases.
  
