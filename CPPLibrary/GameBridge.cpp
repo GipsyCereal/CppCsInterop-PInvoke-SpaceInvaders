@@ -27,7 +27,7 @@ extern "C" _declspec(dllexport) void __stdcall UpdateGameManager(CppLibrary::Gam
 extern "C" __declspec(dllexport) void __stdcall GetGameObjectContainerCpp(CppLibrary::GameManager * pGame, CppLibrary::ObjectContainerType type, CppLibrary::GameObject* const*& pFirstElement, unsigned long* pLength)
 {
 	////use gamemanager to get the container with corresponding "type", set the pFirstElement ptr reference to the address of 1st element in container
-	if(!pGame->GetGameObjectContainer(type).empty())
+	if(!pGame->GetGameObjectContainer(type).empty() && pgame->GetGameObjectContainer(type)[0])
 		pFirstElement = &pGame->GetGameObjectContainer(type)[0];
 	////length of container
 	*pLength = unsigned long(pGame->GetGameObjectContainer(type).size());
