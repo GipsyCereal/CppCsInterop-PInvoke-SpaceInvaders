@@ -37,7 +37,7 @@ To PInvoke said method in managed C# code:
 public static extern void MethodName(int parameter); //If you want a different methodname, clarify with the DllImport attribute using "EntryPoint = "WantedNameForMethod""
 ```
 
-### The C Wrapper
+### Some code from my C Wrapper
 ```cpp
 extern "C" _declspec(dllexport) CppLibrary::GameManager * __stdcall CreateGameManager()
 {
@@ -48,7 +48,12 @@ extern "C" _declspec(dllexport) void __stdcall UpdateGameManager(CppLibrary::Gam
 {
 	gameManager->Update(deltaTime);
 }
+```
+Remember the mentioned issue around classes? The GameObject class cannot be easily PInvoked through a C function, solution == pointers!
+passing a pointer to const pointer reference parameter into our method, we can safely create an std::vector<Gameobject*> and pass a pointer, to the 1st pointer in this vector, to our parameter.
 
+Later, in C# we can ask what is on the pointer's memory address, giving us the pointer to our GameObject data, then marshalling said unmanaged data into a formatted class in C#.
+```cpp
 //passing game obj containers
 extern "C" __declspec(dllexport) void __stdcall GetGameObjectContainerCpp(CppLibrary::GameManager * pGame, CppLibrary::ObjectContainerType type, CppLibrary::GameObject* const*& pFirstElement, unsigned long* pLength)
 {
@@ -58,6 +63,10 @@ extern "C" __declspec(dllexport) void __stdcall GetGameObjectContainerCpp(CppLib
 	////length of container
 	*pLength = unsigned long(pGame->GetGameObjectContainer(type).size());
 }
+```
+
+Some more bridge functions
+```cpp
 extern "C" __declspec(dllexport) int __stdcall GetSizeOfGameObject()
 {
 	return sizeof(CppLibrary::GameObject);
@@ -77,24 +86,5 @@ extern "C" __declspec(dllexport) BSTR __stdcall GetPlayerNameCpp(CppLibrary::Gam
 	return _com_util::ConvertStringToBSTR(pGame->GetName());
 }
 
-extern "C" __declspec(dllexport) void __stdcall MovePlayerObjectCpp(CppLibrary::GameManager * pGame, CppLibrary::Vector2 direction, float deltaTime)
-{
-	pGame->MovePlayer(direction, deltaTime);
-}
-
-extern "C" __declspec(dllexport) void SpawnProjectileObjectCpp(CppLibrary::GameManager * pGame, CppLibrary::Vector2 pos)
-{
-	pGame->SpawnProjectile(pos);
-}
-
-extern "C" __declspec(dllexport) void SetShootDelegateCpp(CppLibrary::GameManager * pGame, CppLibrary::SoundCallback pFnc)
-{
-	pGame->SetShootCallback(pFnc);
-}
-
-extern "C" __declspec(dllexport) void SetKillDelegateCpp(CppLibrary::GameManager * pGame, CppLibrary::SoundCallback pFnc)
-{
-	pGame->SetKillCallback(pFnc);
-}
 ```
 
