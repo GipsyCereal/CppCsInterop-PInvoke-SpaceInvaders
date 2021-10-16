@@ -37,7 +37,7 @@ To PInvoke said method in managed C# code:
 public static extern void MethodName(int parameter); //If you want a different methodname, clarify with the DllImport attribute using "EntryPoint = "WantedNameForMethod""
 ```
 
-### Some code from my C Wrapper
+## Some code from my C Wrapper
 ```cpp
 extern "C" _declspec(dllexport) CppLibrary::GameManager * __stdcall CreateGameManager()
 {
@@ -86,5 +86,72 @@ extern "C" __declspec(dllexport) BSTR __stdcall GetPlayerNameCpp(CppLibrary::Gam
 	return _com_util::ConvertStringToBSTR(pGame->GetName());
 }
 
+```
+
+## Some code from my C# Library
+The PInvoking of my C Wrapped methods
+```c#
+ //BRIDGE FUNCTIONS
+
+        //GAME MANAGER METHODS
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr CreateGameManager();
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        public static extern void UpdateGameManager(IntPtr gameManager, float deltaTime);
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.ThisCall)]
+        public static extern void SpawnProjectileObjectCpp(IntPtr gameManager, Vector2 pos);
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.ThisCall)]
+        public static extern void SetShootDelegateCpp(IntPtr gameManager, Delegate fnc);
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.ThisCall)]
+        public static extern void SetKillDelegateCpp(IntPtr gameManager, Delegate fnc);
+        //________________________________________________________________________________
+
+        //GET CONTAINER
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        public static extern void GetGameObjectContainerCpp(IntPtr gameManager, ObjectContainerType type, out IntPtr firstElement, ref ulong Length);
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        public static extern int GetSizeOfGameObject(IntPtr gameManager);
+        //_________________________________________________________________________________
+
+        //PLAYER METHODS-------------------------------------------------------------------
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        public static extern void GetPlayerObjCpp(IntPtr gameManager, ref GameObject gameObj);
+        //Move the player
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern void MovePlayerObjectCpp(IntPtr gameManager, Vector2 direction, float deltaTime);
+        //Change player name --> LPString --> ptr to null terminated array of ANSI chars
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern void SetPlayerNameCpp(IntPtr gameManager, [MarshalAs(UnmanagedType.LPStr)] string name);
+        //Get player name BSTR prefixed length
+        [DllImport("CPPLibrary", CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.BStr)]
+        public static extern string GetPlayerNameCpp(IntPtr gameManager);
+```
+The GetGameObjectContainer() method in C#, marshalling the Gameobject data
+```c#
+public List<GameObject> GetGameObjectContainer(ObjectContainerType type)
+        {
+
+            List<GameObject> objects = new List<GameObject>();
+            IntPtr ptrToPtr = IntPtr.Zero;
+            ulong length = 0;
+            GetGameObjectContainerCpp(_nativePtr, type, out ptrToPtr, ref length);
+
+            IntPtr ptrToObject = new IntPtr();
+            for (ulong i = 0; i < length; i++)
+            {
+                GameObject gameObject = new GameObject();
+                //Get the pointer to the gameobject from the const ptr reference
+                ptrToObject = (IntPtr)Marshal.PtrToStructure(ptrToPtr, typeof(IntPtr));
+                //Get gameobject from pointer
+                Marshal.PtrToStructure(ptrToObject, gameObject); //classes can also be marshalled if it's formatted
+                objects.Add(gameObject);
+
+                //x64 --> 8 bytes shift for next ptr
+                ptrToPtr = (IntPtr)(ptrToPtr.ToInt64() + 8); 
+            }
+
+            return objects;
+        }
 ```
 
