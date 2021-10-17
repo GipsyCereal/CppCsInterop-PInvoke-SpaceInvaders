@@ -156,4 +156,6 @@ public List<GameObject> GetGameObjectContainer(ObjectContainerType type)
             return objects;
         }
 ```
-
+## Result?
+C++ Space Invaders in Unity3d Engine!
+![Interop Space Invaders GIF]https://gyazo.com/1896ce1884d24ea203ef4f345a23d556
